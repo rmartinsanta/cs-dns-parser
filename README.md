@@ -197,7 +197,8 @@ ConvesationId is `479c52e5`, and the packets are already ordered (0,1,2).
 
 ### BeaconID
 
-Identifies which keys should be used in the team server to decrypt the messages. Keys are transmitted when the beacon sends the metadata petition, encrypted using the teamserver public key. 
+Identifies which AES and HMAC keys to use in the team server to decrypt and validate the messages. A rawkey is transmitted when the beacon sends the metadata petition, encrypted using the teamserver public key. The AES and HMAC keys are derived from this rawkey.
+
 Using the same example as before:
 ```
 post.1270.0479c52e5.19997cf2.wallet.thedarkestside.org
@@ -211,4 +212,4 @@ Domain registered by attackers to recieve the DNS queries and answer them. In ou
 
 ## Acknowledgements
 
-@SergioP3rez for the help solving the challenge and @DidierStevens for its Cobalt Strike tools.
+@SergioP3rez for the help solving the challenge and @DidierStevens for its Cobalt Strike tools and helpful blog posts.
