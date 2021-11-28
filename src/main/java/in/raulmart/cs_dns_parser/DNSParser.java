@@ -22,15 +22,14 @@ public class DNSParser {
      */
     public static final String CS_IV = "abcdefghijklmnop"; //
 
-    // Fake keys detected by cs-extract-key.py without parameters, they do not work
-//    public static final String AES_KEY = "6ccafd9873395d926d576f87ec39f99d";
-//    public static final String HMAC_KEY = "b90a2cd6b9259fc24153fd29d0b8b385";
-
-    // Keys extracted with "python3 cs-extract-key.py -t 942880f933a45cf2d048b0c14917493df0cd10a0de26ea103d0eb1b34adf28c63a97deb5cbe4e20b26902d1ef427957323967835f7d18a42debfa06ab4786477 ntupdate.exe_211110_145816.dmp"
-    public static final String AES_KEY = "550ae29838b3dc28580d6c0ff196deb2";
-    public static final String HMAC_KEY = "0e33af5bf19fe0161e0ba978006670e8";
-
     public static void main(String[] args) throws Exception {
+        if(args.length != 2){
+            System.out.println("Usage: java -jar file.jar [AESKey] [HMACKey]");
+            System.exit(-1);
+        }
+
+        String AESKey = args[0];
+        String HMACKey = args[1];
 
         Map<String, List<ConversationFragment>> conversations = new LinkedHashMap<>();
         Set<String> notImplemented = new HashSet<>();
@@ -67,7 +66,7 @@ public class DNSParser {
             // If conversation is valid, decrypt and parse
             if(recv.isComplete()) {
                 var encrypted = recv.result();
-                var decrypted = decrypt(encrypted);
+                var decrypted = decrypt(encrypted, AESKey, HMACKey);
                 System.out.format(">>>>>>> Id: %s >>>>>> %n", firstFragment.conversationId);
                 if(decrypted.length > 0){
                     processCallbackData(decrypted);
@@ -92,16 +91,16 @@ public class DNSParser {
         }
     }
 
-    private static byte[] decrypt(byte[] payload) throws Exception {
+    private static byte[] decrypt(byte[] payload, String AESKey, String HMACKey) throws Exception {
         var ivspec = new IvParameterSpec(CS_IV.getBytes());
-        var keyspec = new SecretKeySpec(fromHex(AES_KEY), "AES");
+        var keyspec = new SecretKeySpec(fromHex(AESKey), "AES");
         var cypher = Cipher.getInstance("AES/CBC/NoPadding");
         cypher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
 
         byte[] encrypteddata = Arrays.copyOfRange(payload, 0, payload.length - 16);
         byte[] hmac = Arrays.copyOfRange(payload, payload.length - 16, payload.length);
         var mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(fromHex(HMAC_KEY), "HmacSHA256"));
+        mac.init(new SecretKeySpec(fromHex(HMACKey), "HmacSHA256"));
         byte[] calculatedhmac = mac.doFinal(encrypteddata);
 
         boolean matchesHMAC = isValidHMAC(hmac, calculatedhmac);
