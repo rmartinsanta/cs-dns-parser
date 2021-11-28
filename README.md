@@ -153,6 +153,62 @@ Process finished with exit code 0
 
 ```
 
+## Query format explanation
+
+The query uses the following format:
+```
+$configurableprefix.$N$part1.$part2.$partN.$conversationCounter$conversationID.$beaconID.domain
+```
+
+### Configurable prefix
+In the previous example the configurable prefix is `post`, can be changed in the malleable profile.
+
+```
+set beacon               "doc.bc.";
+set get_A                "doc.1a.";
+set get_AAAA             "doc.4a.";
+set get_TXT              "doc.tx.";
+set put_metadata         "doc.md.";
+set put_output           "doc.po.";
+ ```
+### N and Parts
+Number of subdomains to be parsed as data. In the query `post.1270.0479c52e5.19997cf2.wallet.thedarkestside.org`, it is `1`, and the data would be `270`. Becouse this is the first query of the conversation, the `270` represents the total size of the encrypted data in bytes.
+
+In the next queries:
+```
+post.3657d50d5ae8ba94f41aa8e08b0b338fc7433937e55450fa1743b2baa.4bb997434d5f7eb8af5764d51d5d49a3abdaa2adc52fb9471a0e61e1.7714853c0b76b77c5f9ae4e2c00d5dd33dcaa26eeb429b3d98aa0258.1479c52e5.19997cf2.wallet.thedarkestside.org
+post.39acfcd9773cbb3083f55654737ab525e8fde1a8c3928fa6a147d3971.751e83955b70226bbe97f4a96c467e90b9ac0f0e344970c9ce02662d.dd9b02991a44408b84dadbfa7b8ff592e7ef9befe704211b86f24bba.2479c52e5.19997cf2.wallet.thedarkestside.org
+```
+
+the 3 means there are three data segments (`[657d50d5ae8ba94f41aa8e08b0b338fc7433937e55450fa1743b2baa, 4bb997434d5f7eb8af5764d51d5d49a3abdaa2adc52fb9471a0e61e1, 7714853c0b76b77c5f9ae4e2c00d5dd33dcaa26eeb429b3d98aa0258]` in the first query).
+
+After joining all data for conversation `479c52e5` we get a length of `270`, matching the stated previously.
+
+
+### Conversation Counter and ConversationID
+Identify the conversation and the packet order of the queries.
+Using the same example as before:
+```
+post.1270.0479c52e5.19997cf2.wallet.thedarkestside.org
+post.3657d50d5ae8ba94f41aa8e08b0b338fc7433937e55450fa1743b2baa.4bb997434d5f7eb8af5764d51d5d49a3abdaa2adc52fb9471a0e61e1.7714853c0b76b77c5f9ae4e2c00d5dd33dcaa26eeb429b3d98aa0258.1479c52e5.19997cf2.wallet.thedarkestside.org
+post.39acfcd9773cbb3083f55654737ab525e8fde1a8c3928fa6a147d3971.751e83955b70226bbe97f4a96c467e90b9ac0f0e344970c9ce02662d.dd9b02991a44408b84dadbfa7b8ff592e7ef9befe704211b86f24bba.2479c52e5.19997cf2.wallet.thedarkestside.org
+```
+ConvesationId is `479c52e5`, and the packets are already ordered (0,1,2).
+
+### BeaconID
+
+Identifies which keys should be used in the team server to decrypt the messages. Keys are transmitted when the beacon sends the metadata petition, encrypted using the teamserver public key. 
+Using the same example as before:
+```
+post.1270.0479c52e5.19997cf2.wallet.thedarkestside.org
+post.3657d50d5ae8ba94f41aa8e08b0b338fc7433937e55450fa1743b2baa.4bb997434d5f7eb8af5764d51d5d49a3abdaa2adc52fb9471a0e61e1.7714853c0b76b77c5f9ae4e2c00d5dd33dcaa26eeb429b3d98aa0258.1479c52e5.19997cf2.wallet.thedarkestside.org
+post.39acfcd9773cbb3083f55654737ab525e8fde1a8c3928fa6a147d3971.751e83955b70226bbe97f4a96c467e90b9ac0f0e344970c9ce02662d.dd9b02991a44408b84dadbfa7b8ff592e7ef9befe704211b86f24bba.2479c52e5.19997cf2.wallet.thedarkestside.org
+```
+The beaconId would be: `19997cf2`.
+
+### Domain 
+Domain registered by attackers to recieve the DNS queries and answer them. In our example: `.wallet.thedarkestside.org`
+
 ## Acknowledgements
 
-@STesla for fixing the key and @DidierStevens for its Cobalt Strike tools.
+@SergioP3rez for the help solving the challenge and @DidierStevens for its Cobalt Strike tools.
