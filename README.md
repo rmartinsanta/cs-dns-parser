@@ -1,4 +1,4 @@
-# PoC: Cobalt Strike DNS Beacon Decoder
+# PoC: Cobalt Strike DNS Beacon Parser
 
 ## Get queries
 
