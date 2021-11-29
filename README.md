@@ -12,6 +12,11 @@ post.3657d50d5ae8ba94f41aa8e08b0b338fc7433937e55450fa1743b2baa.4bb997434d5f7eb8a
 post.39acfcd9773cbb3083f55654737ab525e8fde1a8c3928fa6a147d3971.751e83955b70226bbe97f4a96c467e90b9ac0f0e344970c9ce02662d.dd9b02991a44408b84dadbfa7b8ff592e7ef9befe704211b86f24bba.2479c52e5.19997cf2.wallet.thedarkestside.org
 ```
 
+To create this queries file from a PCAP source you could use the following command:
+
+```
+tshark -nr <your_capture.pcap> -Y "dns.flags.response == 0 && ip.dst == <C2 Cobalt Strike IP>" -T fields -e dns.qry.name > queries.txt
+```
 ## Get keys
 
 Use DidierStevens cs-extract-key.py tool to get the keys used by the beacon using its memory dump. If possible specify an example query using the `t` parameter. 
